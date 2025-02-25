@@ -5,7 +5,7 @@ const sequelize = new Sequelize('todo_list', 'root', 'root', {
   host: 'localhost',
   dialect: 'mysql'
 });
-
+//建立表
 select(sequelize, DataTypes);
 
 sequelize.sync();

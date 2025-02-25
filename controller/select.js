@@ -1,4 +1,4 @@
-const selectModel=require('../models/index').models.select;;
+const selectModel=require('../models/index').models.select;
 //单条新增
 const create = async function(req,res,next){
   const {name,cast} =req.body;
@@ -26,6 +26,7 @@ const create = async function(req,res,next){
 // }
 //查询单条
 const find = async function(req,res,next){
+  console.log("查询");
   const {id} =req.query;//查询是query
   let data
   if(id){
@@ -98,10 +99,49 @@ const putUpdate = async function(req,res,next){
   }
 
 }
+//分页查询
+const findPage = async function(req,res,next){
+  const page = Number(req.query.page) || 1;
+  const pageSize = Number(req.query.pageSize) || 4;
+
+  const offset = (page - 1) * pageSize;
+
+  try {
+    const result = await selectModel.findAndCountAll({
+      offset,
+      limit: pageSize,
+    });
+
+    // 根据总数据量生成页面大小选项
+    const total = result.count;
+    const maxPageSize = Math.min(total, 12); // 设置最大页面大小为12
+    const pageSizeOptions = [2,4, 8, maxPageSize].filter(size => size <= total);
+
+    const responseData = {
+      list: result.rows,
+      total: result.count,
+      page: page,
+      pageSize: pageSize,
+      pageSizeOptions  // 动态生成的页面大小选项
+    };
+
+    res.json({
+      code: 1,
+      data: responseData
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: 0,
+      msg: '查询失败',
+      error: error.message
+    });
+  }
+}
 module.exports ={
   create,
   //createAll
   find,
   putDelete,
-  putUpdate
+  putUpdate,
+  findPage
 };
