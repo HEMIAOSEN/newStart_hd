@@ -27,17 +27,23 @@ const create = async function(req,res,next){
 //查询单条
 const find = async function(req,res,next){
   console.log("查询");
-  const {id} =req.query;//查询是query
+  const {id} =req.query;
   let data
   if(id){
-    data=await selectModel.findOne({
-      where:{
+    data = await selectModel.findOne({
+      where: {
         id
-      }
+      },
+      order: [
+        ['id', 'DESC']
+      ]
     })
-
-  }else{
-    data= await selectModel.findAll();
+  } else {
+    data = await selectModel.findAll({
+      order: [
+        ['id', 'DESC']
+      ]
+    });
   }
   res.json({code:1,msg:'ok',data});
 }
@@ -110,6 +116,9 @@ const findPage = async function(req,res,next){
     const result = await selectModel.findAndCountAll({
       offset,
       limit: pageSize,
+      order: [
+        ['id', 'DESC']  // 按 id 降序排序，最新数据在前
+      ]
     });
 
     // 根据总数据量生成页面大小选项
